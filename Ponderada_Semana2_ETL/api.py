@@ -5,11 +5,13 @@ import json
 import requests
 import pytz
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 brasil_timezone = pytz.timezone('America/Sao_Paulo')
+
 def get_brasil_datetime():
     return datetime.now(brasil_timezone)
 class WeatherData(db.Model):
@@ -18,6 +20,7 @@ class WeatherData(db.Model):
     data_tipo = db.Column(db.String(50))
     valores = db.Column(db.String(100))
     uso = db.Column(db.String(100))
+
 def funcao_etl():
     api_key = '7e15951f31a6f5146a44725003d8dd61'
     cidades = ['São Paulo', 'Rio de Janeiro', 'Bahia', 'Amazonas', 'Santa Catarina', 'Sergipe']
@@ -46,11 +49,13 @@ def funcao_etl():
     db.session.add_all(lista_dados_climaticos)
     db.session.commit()
     return lista_dados_climaticos
+
 from flask import render_template
 @app.route('/all_weather_data', methods=['GET'])
 def display_all_weather_data():
     weather_data = WeatherData.query.all()
     return render_template('all_weather_data.html', weather_data=weather_data)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
